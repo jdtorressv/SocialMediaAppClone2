@@ -35,3 +35,16 @@ exports.validateLoginData = (data) => {
     }
 
 }
+
+exports.reduceUserDetails = (data) => {
+    let userDetails = {};
+
+    if (!isEmpty(data.bio.trim())) userDetails.bio = data.bio;
+    let webtrim = data.website.trim(); 
+    if (!isEmpty(webtrim)) {
+        userDetails.website = webtrim.substring(0,4) !== 'http' ? `http://${webtrim}` :  data.website;       
+    }
+    if (!isEmpty(data.location.trim())) userDetails.location = data.location;
+
+    return userDetails;
+}
