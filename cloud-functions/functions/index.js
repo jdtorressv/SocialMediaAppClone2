@@ -3,12 +3,14 @@ const app = require('express')();
 
 const FBAuth = require('./util/fbAuth');
 
-const {getAllTweets, postOneTweet} = require('./handlers/tweets');
+const {getAllTweets, postOneTweet, getTweet, commentOnTweet} = require('./handlers/tweets');
 const {signup, login, uploadImage, addUserDetails, getAuthenticatedUser} = require('./handlers/users');
 
 // Tweet routes  
 app.get('/tweets', getAllTweets);
 app.post('/tweet', FBAuth, postOneTweet);
+app.get('/tweet/:tweetId', getTweet);
+app.post('/tweet/:tweetId/comment', FBAuth, commentOnTweet);
 
 //User routes
 app.post('/signup', signup);
