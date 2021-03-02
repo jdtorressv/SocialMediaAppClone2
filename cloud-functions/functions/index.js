@@ -42,16 +42,12 @@ exports.createNotificationOnLike = functions
             sender: snapshot.data().userHandle,
             type: 'like',
             read: false,
-            screamId: doc.id
+            tweetId: doc.id
           });
         }
       })
-      // .then(() => {
-      //   return;
-      // })
       .catch((err) => {
         console.error(err);
-        return;
       })
   });
 
@@ -61,12 +57,8 @@ exports.deleteNotificationOnUnLike = functions
     return db
       .doc(`/notifications/${snapshot.id}`)
       .delete()
-      // .then(() => {
-      //   return;
-      // })
       .catch((err) => {
         console.error(err);
-        return;
       });
   });
 
@@ -87,15 +79,69 @@ exports.createNotificationOnComment = functions
             sender: snapshot.data().userHandle,
             type: 'comment',
             read: false,
-            screamId: doc.id
+            tweetId: doc.id
           });
         }
       })
-      // .then(() => {
-      //   return;
-      // })
       .catch((err) => {
         console.error(err);
-        return;
       });
+  });
+
+  exports.onUserImageChange = functions
+  .firestore.document('/users/{userId}')
+  .onUpdate((change) => {
+    console.log(change.before.data());
+    console.log(change.after.data());
+    if (change.before.data().imageUrl !== change.after.data().imageUrl) {
+      console.log('image has changed');
+      const batch = db.batch();
+      return db
+        .collection('tweets')
+        .where('userHandle', '==', change.before.data().handle)
+        .get()
+        .then((data) => {
+          data.forEach((doc) => {
+            const tweet = db.doc(`/tweets/${doc.id}`);
+            batch.update(tweet, { userImage: change.after.data().imageUrl });
+          });
+          return batch.commit();
+        });
+    } else return true;
+  });
+
+exports.onTweetDelete = functions
+  .firestore.document('/tweets/{tweetId}')
+  .onDelete((snapshot, context) => {
+    const tweetId = context.params.tweetId;
+    const batch = db.batch();
+    return db
+      .collection('comments')
+      .where('tweetId', '==', tweetId)
+      .get()
+      .then((data) => {
+        data.forEach((doc) => {
+          batch.delete(db.doc(`/comments/${doc.id}`));
+        });
+        return db
+          .collection('likes')
+          .where('tweetId', '==', tweetId)
+          .get();
+      })
+      .then((data) => {
+        data.forEach((doc) => {
+          batch.delete(db.doc(`/likes/${doc.id}`));
+        });
+        return db
+          .collection('notifications')
+          .where('tweetId', '==', tweetId)
+          .get();
+      })
+      .then((data) => {
+        data.forEach((doc) => {
+          batch.delete(db.doc(`/notifications/${doc.id}`));
+        });
+        return batch.commit();
+      })
+      .catch((err) => console.error(err));
   });

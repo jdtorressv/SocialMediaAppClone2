@@ -13,7 +13,10 @@ exports.getAllTweets = (req, res) => {
                 tweetId: doc.id,
                 body: doc.data().body,
                 userHandle: doc.data().userHandle,
-                createdAt: doc.data().createdAt
+                createdAt: doc.data().createdAt,
+                commentCount: doc.data().commentCount,
+                likeCount: doc.data().likeCount,
+                userImage: doc.data().userImage
             });
         });
         return res.json(tweets);
@@ -76,7 +79,7 @@ exports.getTweet = (req, res) => {
 
 // Comment on a tweet
 exports.commentOnTweet = (req, res) => {
-    if (req.body.body.trim() === '') return res.status(400).json({error: "Comment cannot be empty"});
+    if (req.body.body.trim() === '') return res.status(400).json({comment: "Comment cannot be empty"});
     const comment = {
         body: req.body.body,
         createdAt: new Date().toISOString(),
