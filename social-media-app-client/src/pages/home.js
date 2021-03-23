@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import { Grid } from "@material-ui/core";
-import axios from "axios";
-import Tweet from "../components/Tweet";
+import React, { Component } from 'react';
+import { Grid } from '@material-ui/core';
+import axios from 'axios';
+import Tweet from '../components/Tweet';
 
 export class home extends Component {
   state = {
@@ -9,9 +9,8 @@ export class home extends Component {
   };
   componentDidMount() {
     axios
-      .get("/tweets")
+      .get('/tweets')
       .then((res) => {
-        console.log(res.data);
         this.setState({
           tweets: res.data,
         });
@@ -20,7 +19,9 @@ export class home extends Component {
   }
   render() {
     let recentTweetsMarkup = this.state.tweets ? (
-      this.state.tweets.map((tweet) => <Tweet tweet={tweet} />)
+      this.state.tweets.map((tweet) => (
+        <Tweet key={tweet.tweetId} tweet={tweet} />
+      ))
     ) : (
       <p>Loading...</p>
     );
