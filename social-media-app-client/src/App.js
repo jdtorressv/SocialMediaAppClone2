@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core';
+import jwtDecode from 'jwt-decode';
 
 //Components
 import Navbar from './components/Navbar';
+import AuthRoute from './util/AuthRoute';
 
 //Pages
 import home from './pages/home';
@@ -35,6 +37,20 @@ const theme = createMuiTheme({
   },
 });
 
+let authenticated;
+const token = localStorage.FBIdToken;
+
+if (token) {
+  const decodedToken = jwtDecode(token);
+  if (decodedToken.exp * 1000 < Date.now()) {
+    // Token has expired
+    window.location.href = '/login';
+    authenticated = false;
+  } else {
+    authenticated = true;
+  }
+}
+
 class App extends Component {
   render() {
     return (
@@ -45,8 +61,16 @@ class App extends Component {
             <div className="container">
               <Switch>
                 <Route exact path="/" component={home} />
-                <Route path="/login" component={login} />
-                <Route path="/signup" component={signup} />
+                <AuthRoute
+                  path="/login"
+                  authenticated={authenticated}
+                  component={login}
+                />
+                <AuthRoute
+                  path="/signup"
+                  authenticated={authenticated}
+                  component={signup}
+                />
               </Switch>
             </div>
           </Router>
