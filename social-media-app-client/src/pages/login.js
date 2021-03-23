@@ -28,7 +28,7 @@ const styles = {
     margin: '10px auto 10px auto',
   },
   button: {
-    marginTop: 20,
+    margin: '20px auto 20px auto',
     position: 'relative',
   },
   customError: {
@@ -89,12 +89,9 @@ export class login extends Component {
       <Grid container className={classes.form}>
         <Grid item sm />
         <Grid item sm>
-          <img src={AppIcon} alt="Osprey Image" className={classes.image} />
+          <img src={AppIcon} className={classes.image} />
           <Typography variant="h2" className={classes.pageTitle}>
             Login
-            {loading && (
-              <CircularProgress size={30} className={classes.progress} />
-            )}
           </Typography>
           <form noValidate onSubmit={this.handleSubmit}>
             <TextField
@@ -134,6 +131,9 @@ export class login extends Component {
               disabled={loading}
             >
               Login
+              {loading && (
+                <CircularProgress size={30} className={classes.progress} />
+              )}
             </Button>
             <br />
             <small>
