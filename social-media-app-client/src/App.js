@@ -42,16 +42,21 @@ const theme = createMuiTheme({
 });
 
 let authenticated = false;
+let tokExpAck = false;
 const token = localStorage.FBIdToken;
 
 if (token) {
   const decodedToken = jwtDecode(token);
   console.log(`Recorded token expiraton: ${new Date(decodedToken.exp * 1000)}`);
   if (decodedToken.exp * 1000 < Date.now()) {
-    console.log('Recorded token has expired');
-    window.location.href = '/login';
-    authenticated = false;
-    token = false;
+    if (!tokExpAck) {
+      console.log('Recorded token has expired');
+      window.location.href = '/login';
+      authenticated = false;
+      tokExpAck = true;
+    } else {
+      console.log('We have already pushed to login page as token is expired');
+    }
   } else {
     authenticated = true;
     console.log('Recorded token is current');
